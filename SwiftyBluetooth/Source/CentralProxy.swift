@@ -108,7 +108,7 @@ private final class PeripheralScanRequest {
 }
 
 extension CentralProxy {
-    func scanWithTimeout(_ timeout: TimeInterval, serviceUUIDs: [CBUUID]?, options: [String : Any]?, _ callback: @escaping PeripheralScanCallback) {
+    func scanWithTimeout(_ timeout: TimeInterval, serviceUUIDs: [CBUUID]?, _ callback: @escaping PeripheralScanCallback) {
         initializeBluetooth { [unowned self] (error) in
             if let error = error {
                 callback(PeripheralScanResult.scanStopped(error: error))
@@ -121,7 +121,7 @@ extension CentralProxy {
                 self.scanRequest = scanRequest
                 
                 scanRequest.callback(.scanStarted)
-                self.centralManager.scanForPeripherals(withServices: serviceUUIDs, options: options)
+                self.centralManager.scanForPeripherals(withServices: serviceUUIDs, options: nil)
                 
                 Timer.scheduledTimer(
                     timeInterval: timeout,
@@ -156,7 +156,7 @@ extension CentralProxy {
 }
 
 // MARK: Connect Peripheral requests
-private final class ConnectPeripheralRequest {
+ final class ConnectPeripheralRequest {
     var callbacks: [ConnectPeripheralCallback] = []
     
     let peripheral: CBPeripheral
@@ -234,7 +234,7 @@ extension CentralProxy {
 }
 
 // MARK: Disconnect Peripheral requests
-private final class DisconnectPeripheralRequest {
+ final class DisconnectPeripheralRequest {
     var callbacks: [ConnectPeripheralCallback] = []
     
     let peripheral: CBPeripheral
@@ -349,6 +349,7 @@ extension CentralProxy: CBCentralManagerDelegate {
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        NotificationCenter.default.post(name: Central.DisconnectedPeripheral, object: peripheral, userInfo: nil)
         let uuid = peripheral.identifier
         guard let request = disconnectRequests[uuid] else {
             return

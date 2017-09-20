@@ -37,7 +37,7 @@ final class PeripheralProxy: NSObject  {
     fileprivate lazy var writeDescriptorValueRequests: [CBUUIDPath: [WriteDescriptorValueRequest]] = [:]
     fileprivate lazy var updateNotificationStateRequests: [CBUUIDPath: [UpdateNotificationStateRequest]] = [:]
     
-    fileprivate weak var peripheral: Peripheral?
+    weak var peripheral: Peripheral?
     let cbPeripheral: CBPeripheral
     
     // Peripheral that are no longer valid must be rediscovered again (happens when for example the Bluetooth is turned off
