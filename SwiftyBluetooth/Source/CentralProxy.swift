@@ -67,6 +67,7 @@ extension CentralProxy {
             completion(.unauthorized)
         case .poweredOff:
             completion(.poweredOff)
+            centralManager = nil
         case .poweredOn:
             completion(.poweredOn)
         }
