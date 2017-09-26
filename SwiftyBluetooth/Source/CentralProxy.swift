@@ -328,6 +328,7 @@ extension CentralProxy: CBCentralManagerDelegate {
             self.callAsyncCentralStateCallback(.unauthorized)
             self.stopScan(error: .scanningEndedUnexpectedly)
         case 4: // .poweredOff
+          NotificationCenter.default.post(name: Central.BluetoothOFF, object: nil, userInfo: nil)
             self.callAsyncCentralStateCallback(.poweredOff)
             self.stopScan(error: .scanningEndedUnexpectedly)
         case 5: // .poweredOn

@@ -80,6 +80,7 @@ public final class Central {
     /// Unwrap with `notification.userInfo?["state"] as? CBCentralManagerState`
     public static let CentralStateChange = Notification.Name("SwiftyBluetooth_CentralStateChange")
     public static let DisconnectedPeripheral = Notification.Name("DisconnectedPeripheral")
+    public static let BluetoothOFF = Notification.Name("BluetoothOFF")
     
     /// The sharedInstance Singleton, you can instantiate it yourself by
     /// calling `setSharedInstanceWith(restoreIdentifier: )` which will allow you
