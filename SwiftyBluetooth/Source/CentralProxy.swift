@@ -69,7 +69,7 @@ extension CentralProxy {
             completion(.poweredOff)
         case .poweredOn:
             completion(.poweredOn)
-            //centralManager = CBCentralManager(delegate: self, queue: nil)
+            centralManager = CBCentralManager(delegate: self, queue: nil)
         }
     }
     
