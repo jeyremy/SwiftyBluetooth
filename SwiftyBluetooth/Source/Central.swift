@@ -205,7 +205,9 @@ extension Central {
     public func stopScan() {
         centralProxy.stopScan()
     }
-    
+    public func cancelConnection(_ peripheral: CBPeripheral) {
+        centralProxy.centralManager.cancelPeripheralConnection(peripheral)
+    }
     /// Sometime, the bluetooth state of your iOS Device/CBCentralManagerState is in an inbetween state of either
     /// ".Unknown" or ".Reseting". This function will wait until the bluetooth state is stable and return a subset
     /// of the CBCentralManager state value which does not includes these values in its completion closure.
