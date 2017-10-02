@@ -400,7 +400,10 @@ extension CentralProxy: CBCentralManagerDelegate {
     
     func centralManager(_ central: CBCentralManager, willRestoreState dict: [String: Any]) {
         let peripherals = ((dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral]) ?? []).map { Peripheral(peripheral: $0) }
-        postCentralEvent(Central.CentralManagerWillRestoreState, userInfo: ["peripherals": peripherals])
+        if let cbPeripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] {
+        postCentralEvent(Central.CentralManagerWillRestoreState, userInfo: ["peripherals": peripherals,
+                                                                            "cbPeripherals": cbPeripherals])
+        }
     }
 
 }
