@@ -335,8 +335,10 @@ extension CentralProxy: CBCentralManagerDelegate {
         case 4: // .poweredOff
             self.callAsyncCentralStateCallback(.poweredOff)
             self.stopScan(error: .scanningEndedUnexpectedly)
+            NotificationCenter.default.post(name: Central.BluetoothOFF, object: nil, userInfo: nil)
         case 5: // .poweredOn
             self.callAsyncCentralStateCallback(.poweredOn)
+             NotificationCenter.default.post(name: Central.BluetoothON, object: nil, userInfo: nil)
         default:
             fatalError("Unsupported BLE CentralState")
         }
@@ -365,6 +367,11 @@ extension CentralProxy: CBCentralManagerDelegate {
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+            if error != nil {
+                    NotificationCenter.default.post(name: Central.DisconnectedPeripheral, object: peripheral, userInfo: ["error": error])
+            } else {
+            NotificationCenter.default.post(name: Central.DisconnectedPeripheral, object: peripheral, userInfo: nil)
+            }
         let uuid = peripheral.identifier
         guard let request = connectRequests[uuid] else {
             return
