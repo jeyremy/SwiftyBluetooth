@@ -79,7 +79,9 @@ public final class Central {
     /// The new `CBCentralManagerState` can be found in the notification's userInfo.
     /// Unwrap with `notification.userInfo?["state"] as? CBCentralManagerState`
     public static let CentralStateChange = Notification.Name("SwiftyBluetooth_CentralStateChange")
-    
+    public static let DisconnectedPeripheral = Notification.Name("DisconnectedPeripheral")
+    public static let BluetoothOFF = Notification.Name("BluetoothOFF")
+    public static let BluetoothON = Notification.Name("BluetoothN")
     /// The sharedInstance Singleton, you can instantiate it yourself by
     /// calling `setSharedInstanceWith(restoreIdentifier: )` which will allow you
     /// to pass in a state preservation identifier. Otherwise, this sharedInstance
@@ -190,13 +192,12 @@ extension Central {
     /// - Parameter serviceUUIDs: The service UUIDs to search peripherals for or nil if looking for all peripherals.
     /// - Parameter completion: The closures, called multiple times throughout a scan.
     public func scanForPeripherals(withServiceUUIDs serviceUUIDs: [CBUUIDConvertible]? = nil,
-                                   options: [String : Any]? = nil,
                                    timeoutAfter timeout: TimeInterval,
                                    completion: @escaping PeripheralScanCallback) {
         // Passing in an empty array will act the same as if you passed nil and discover all peripherals but
         // it is recommended to pass in nil for those cases similarly to how the CoreBluetooth scan method works
         assert(serviceUUIDs == nil || serviceUUIDs!.count > 0)
-        centralProxy.scanWithTimeout(timeout, serviceUUIDs: ExtractCBUUIDs(serviceUUIDs), options: options, completion)
+        centralProxy.scanWithTimeout(timeout, serviceUUIDs: ExtractCBUUIDs(serviceUUIDs), completion)
     }
     
     /// Will stop the current scan through a CBCentralManager stopScan() function call and invokes the completion
@@ -204,7 +205,9 @@ extension Central {
     public func stopScan() {
         centralProxy.stopScan()
     }
-    
+    public func cancelConnection(_ peripheral: CBPeripheral) {
+        centralProxy.centralManager.cancelPeripheralConnection(peripheral)
+    }
     /// Sometime, the bluetooth state of your iOS Device/CBCentralManagerState is in an inbetween state of either
     /// ".Unknown" or ".Reseting". This function will wait until the bluetooth state is stable and return a subset
     /// of the CBCentralManager state value which does not includes these values in its completion closure.
