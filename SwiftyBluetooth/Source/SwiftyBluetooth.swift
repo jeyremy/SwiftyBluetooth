@@ -39,10 +39,12 @@ public func setSharedCentralInstanceWith(restoreIdentifier: String) -> Central {
 /// - Parameter serviceUUIDs: The service UUIDs to search peripherals for or nil if looking for all peripherals.
 /// - Parameter completion: The closures, called multiple times throughout a scan.
 public func scanForPeripherals(withServiceUUIDs serviceUUIDs: [CBUUIDConvertible]? = nil,
+                               options: [String : Any]? = nil,
                                timeoutAfter timeout: TimeInterval,
                                completion: @escaping PeripheralScanCallback)
 {
     Central.sharedInstance.scanForPeripherals(withServiceUUIDs: serviceUUIDs,
+                                              options: options,
                                               timeoutAfter: timeout,
                                               completion: completion)
 }
@@ -51,9 +53,6 @@ public func scanForPeripherals(withServiceUUIDs serviceUUIDs: [CBUUIDConvertible
 /// closures of the original scanWithTimeout function call with a scanStopped result containing an error if something went wrong.
 public func stopScan() {
     Central.sharedInstance.stopScan()
-}
-public func cancelConnection(_ peripheral: CBPeripheral) {
-    Central.sharedInstance.cancelConnection(peripheral)
 }
 
 /// Sometimes, the bluetooth state of your iOS Device/CBCentralManagerState is in an inbetween state of either

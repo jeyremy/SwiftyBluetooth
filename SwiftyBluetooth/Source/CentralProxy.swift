@@ -108,7 +108,7 @@ private final class PeripheralScanRequest {
 }
 
 extension CentralProxy {
-    func scanWithTimeout(_ timeout: TimeInterval, serviceUUIDs: [CBUUID]?, _ callback: @escaping PeripheralScanCallback) {
+    func scanWithTimeout(_ timeout: TimeInterval, serviceUUIDs: [CBUUID]?, options: [String : Any]?, _ callback: @escaping PeripheralScanCallback) {
         initializeBluetooth { [unowned self] (error) in
             if let error = error {
                 callback(PeripheralScanResult.scanStopped(error: error))
@@ -121,7 +121,7 @@ extension CentralProxy {
                 self.scanRequest = scanRequest
                 
                 scanRequest.callback(.scanStarted)
-                self.centralManager.scanForPeripherals(withServices: serviceUUIDs, options: nil)
+                self.centralManager.scanForPeripherals(withServices: serviceUUIDs, options: options)
                 
                 Timer.scheduledTimer(
                     timeInterval: timeout,
@@ -161,7 +161,7 @@ extension CentralProxy {
 }
 
 // MARK: Connect Peripheral requests
- final class ConnectPeripheralRequest {
+private final class ConnectPeripheralRequest {
     var callbacks: [ConnectPeripheralCallback] = []
     
     let peripheral: CBPeripheral
@@ -239,7 +239,7 @@ extension CentralProxy {
 }
 
 // MARK: Disconnect Peripheral requests
- final class DisconnectPeripheralRequest {
+private final class DisconnectPeripheralRequest {
     var callbacks: [ConnectPeripheralCallback] = []
     
     let peripheral: CBPeripheral
@@ -335,10 +335,8 @@ extension CentralProxy: CBCentralManagerDelegate {
         case 4: // .poweredOff
             self.callAsyncCentralStateCallback(.poweredOff)
             self.stopScan(error: .scanningEndedUnexpectedly)
-             NotificationCenter.default.post(name: Central.BluetoothOFF, object: nil, userInfo: nil)
         case 5: // .poweredOn
             self.callAsyncCentralStateCallback(.poweredOn)
-            NotificationCenter.default.post(name: Central.BluetoothON, object: nil, userInfo: nil)
         default:
             fatalError("Unsupported BLE CentralState")
         }
@@ -356,11 +354,6 @@ extension CentralProxy: CBCentralManagerDelegate {
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        if error != nil {
-        NotificationCenter.default.post(name: Central.DisconnectedPeripheral, object: peripheral, userInfo: ["error": error])
-        } else {
-             NotificationCenter.default.post(name: Central.DisconnectedPeripheral, object: peripheral, userInfo: nil)
-        }
         let uuid = peripheral.identifier
         guard let request = disconnectRequests[uuid] else {
             return
@@ -405,10 +398,7 @@ extension CentralProxy: CBCentralManagerDelegate {
     
     func centralManager(_ central: CBCentralManager, willRestoreState dict: [String: Any]) {
         let peripherals = ((dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral]) ?? []).map { Peripheral(peripheral: $0) }
-        if let cbPeripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] {
-        postCentralEvent(Central.CentralManagerWillRestoreState, userInfo: ["peripherals": peripherals,
-                                                                            "cbPeripherals": cbPeripherals])
-        }
+        postCentralEvent(Central.CentralManagerWillRestoreState, userInfo: ["peripherals": peripherals])
     }
 
 }
